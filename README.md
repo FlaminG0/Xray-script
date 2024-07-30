@@ -100,6 +100,8 @@
 
 **此脚本仅供交流学习使用，请勿使用此脚本行违法之事。网络非法外之地，行非法之事，必将接受法律制裁。**
 
+Copied from https://github.com/zxcvos/Xray-script
+
 [Xray-core]: https://github.com/XTLS/Xray-core (THE NEXT FUTURE)
 [REALITY]: https://github.com/XTLS/REALITY (THE NEXT FUTURE)
 [chika0801-Xray-examples]: https://github.com/chika0801/Xray-examples (chika0801 Xray 配置文件模板)
