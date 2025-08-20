@@ -30,19 +30,19 @@ declare new_port
 
 # status print
 function _info() {
-  printf "${GREEN}[信息] ${NC}"
+  printf "${GREEN}[info] ${NC}"
   printf -- "%s" "$@"
   printf "\n"
 }
 
 function _warn() {
-  printf "${YELLOW}[警告] ${NC}"
+  printf "${YELLOW}[warning] ${NC}"
   printf -- "%s" "$@"
   printf "\n"
 }
 
 function _error() {
-  printf "${RED}[错误] ${NC}"
+  printf "${RED}[error] ${NC}"
   printf -- "%s" "$@"
   printf "\n"
   exit 1
@@ -145,35 +145,35 @@ function _systemctl() {
   local server_name="$2"
   case "${cmd}" in
   start)
-    _info "正在启动 ${server_name} 服务"
+    _info "starting ${server_name} service"
     systemctl -q is-active ${server_name} || systemctl -q start ${server_name}
     systemctl -q is-enabled ${server_name} || systemctl -q enable ${server_name}
     sleep 2
-    systemctl -q is-active ${server_name} && _info "已启动 ${server_name} 服务" || _error "${server_name} 启动失败"
+    systemctl -q is-active ${server_name} && _info "started ${server_name} service" || _error "${server_name} start failed"
     ;;
   stop)
-    _info "正在暂停 ${server_name} 服务"
+    _info "pausing ${server_name} service"
     systemctl -q is-active ${server_name} && systemctl -q stop ${server_name}
     systemctl -q is-enabled ${server_name} && systemctl -q disable ${server_name}
     sleep 2
-    systemctl -q is-active ${server_name} || _info "已暂停 ${server_name} 服务"
+    systemctl -q is-active ${server_name} || _info "paused ${server_name} service"
     ;;
   restart)
-    _info "正在重启 ${server_name} 服务"
+    _info "restarting ${server_name} service"
     systemctl -q is-active ${server_name} && systemctl -q restart ${server_name} || systemctl -q start ${server_name}
     systemctl -q is-enabled ${server_name} || systemctl -q enable ${server_name}
     sleep 2
-    systemctl -q is-active ${server_name} && _info "已重启 ${server_name} 服务" || _error "${server_name} 启动失败"
+    systemctl -q is-active ${server_name} && _info "restarted ${server_name} service" || _error "${server_name} start failed"
     ;;
   reload)
-    _info "正在重载 ${server_name} 服务"
+    _info "reloading ${server_name} service"
     systemctl -q is-active ${server_name} && systemctl -q reload ${server_name} || systemctl -q start ${server_name}
     systemctl -q is-enabled ${server_name} || systemctl -q enable ${server_name}
     sleep 2
-    systemctl -q is-active ${server_name} && _info "已重载 ${server_name} 服务"
+    systemctl -q is-active ${server_name} && _info "reloaded ${server_name} service"
     ;;
   dr)
-    _info "正在重载 systemd 配置文件"
+    _info "reloading systemd config"
     systemctl daemon-reload
     ;;
   esac
@@ -213,9 +213,9 @@ function select_dest() {
   local pick_dest=""
   local all_sns=""
   local sns=""
-  local prompt="请选择你的 dest, 当前默认使用 \"${cur_dest}\", 自填选 0: "
+  local prompt="please choose your dest, currently using \"${cur_dest}\", DIY choose 0: "
   until [[ ${is_dest} =~ ^[Yy]$ ]]; do
-    echo -e "---------------- dest 列表 -----------------"
+    echo -e "---------------- dest list -----------------"
     _print_list "${dest_list[@]}"
     read -p "${prompt}" pick
     if [[ "${pick}" == "" && "${cur_dest}" != "" ]]; then
@@ -223,7 +223,7 @@ function select_dest() {
       break
     fi
     if ! _is_digit "${pick}" || [[ "${pick}" -lt 0 || "${pick}" -gt ${#dest_list[@]} ]]; then
-      prompt="输入错误, 请输入 0-${#dest_list[@]} 之间的数字: "
+      prompt="wrong input, please type in 0-${#dest_list[@]} number: "
       continue
     fi
     if [[ "${pick}" == "0" ]]; then
@@ -251,7 +251,7 @@ function select_dest() {
       pick_dest="${dest_list[${pick} - 1]}"
     fi
     read -r -p "是否使用 dest: \"${pick_dest}\" [y/n] " is_dest
-    prompt="请选择你的 dest, 当前默认使用 \"${cur_dest}\", 自填选 0: "
+    prompt="please choose your dest, currently using \"${cur_dest}\", DIY choose 0: "
     echo -e "-------------------------------------------"
   done
   _info "正在修改配置"
@@ -278,24 +278,24 @@ function read_port() {
   local cur_port="${2}"
   until [[ ${is_port} =~ ^[Yy]$ ]]; do
     echo "${prompt}"
-    read -p "请输入自定义的端口(1-65535), 默认不修改: " new_port
+    read -p "please type in the custom port (1-65535), no change by default: " new_port
     if [[ "${new_port}" == "" || ${new_port} -eq ${cur_port} ]]; then
       new_port=${cur_port}
-      _info "不修改，继续使用原端口: ${cur_port}"
+      _info "no change, keep use default port: ${cur_port}"
       break
     fi
     if ! _is_digit "${new_port}" || [[ ${new_port} -lt 1 || ${new_port} -gt 65535 ]]; then
-      prompt="输入错误, 端口范围是 1-65535 之间的数字"
+      prompt="wrong input, port range is a number from 1 to 65535"
       continue
     fi
-    read -r -p "请确认端口: \"${new_port}\" [y/n] " is_port
+    read -r -p "please verify port: \"${new_port}\" [y/n] " is_port
     prompt="${1}"
   done
 }
 
 function read_uuid() {
-  _info '自定义输入的 uuid ，如果不是标准格式，将会使用 xray uuid -i "自定义字符串" 进行 UUIDv5 映射后填入配置'
-  read -p "请输入自定义 UUID, 默认则自动生成: " in_uuid
+  _info 'type into custom uuid ，如果不是标准格式，将会使用 xray uuid -i "自定义字符串" 进行 UUIDv5 映射后填入配置'
+  read -p "please type in UUID, generate by default: " in_uuid
 }
 
 # check os
@@ -318,7 +318,7 @@ function check_os() {
 }
 
 function install_dependencies() {
-  _info "正在下载相关依赖"
+  _info "downloading related dependency"
   _install "ca-certificates openssl curl wget jq tzdata"
   case "$(_os)" in
   centos)
@@ -331,7 +331,7 @@ function install_dependencies() {
 }
 
 function install_update_xray() {
-  _info "正在安装或更新 Xray"
+  _info "installing or updating Xray"
   _error_detect 'bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install -u root --beta'
   jq --arg ver "$(xray version | head -n 1 | cut -d \( -f 1 | grep -Eoi '[0-9.]*')" '.xray.version = $ver' /usr/local/etc/xray-script/config.json >/usr/local/etc/xray-script/new.json && mv -f /usr/local/etc/xray-script/new.json /usr/local/etc/xray-script/config.json
   wget -O /usr/local/etc/xray-script/update-dat.sh https://raw.githubusercontent.com/FlaminG0/Xray-script/main/tool/update-dat.sh
@@ -341,7 +341,7 @@ function install_update_xray() {
 }
 
 function purge_xray() {
-  _info "正在卸载 Xray"
+  _info "uninstalling Xray"
   crontab -l | grep -v "/usr/local/etc/xray-script/update-dat.sh >/dev/null 2>&1" | crontab -
   _systemctl "stop" "xray"
   bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ remove --purge
@@ -354,14 +354,14 @@ function purge_xray() {
 }
 
 function service_xray() {
-  _info "正在配置 xray.service"
+  _info "configing xray.service"
   wget -O ${HOME}/xray.service https://raw.githubusercontent.com/FlaminG0/Xray-script/main/service/xray.service
   mv -f ${HOME}/xray.service /etc/systemd/system/xray.service
   _systemctl dr
 }
 
 function config_xray() {
-  _info "正在配置 xray config.json"
+  _info "configing xray config.json"
   "${xray_config_manage}" --path ${HOME}/config.json --download
   local xray_x25519=$(xray x25519)
   local xs_private_key=$(echo ${xray_x25519} | awk '{print $3}')
@@ -405,14 +405,13 @@ function show_config() {
   echo -e "ShortId     : ${xs_shortIds%,}"
   echo -e "SpiderX     : ${xs_spiderX}"
   echo -e "------------------------------------------"
-  read -p "是否生成分享链接[y/n]: " is_show_share_link
+  read -p "generate share link or not [y/n]: " is_show_share_link
   echo
   if [[ ${is_show_share_link} =~ ^[Yy]$ ]]; then
     show_share_link
   else
     echo -e "------------------------------------------"
-    echo -e "${RED}此脚本仅供交流学习使用，请勿使用此脚本行违法之事。${NC}"
-    echo -e "${RED}网络非法外之地，行非法之事，必将接受法律制裁。${NC}"
+    echo -e "${RED}reference codes.${NC}"
     echo -e "------------------------------------------"
   fi
 }
@@ -473,17 +472,17 @@ function menu() {
   clear
   echo -e "--------------- Xray-script ---------------"
   echo -e " Version      : ${GREEN}v2023-03-15${NC}(${RED}beta${NC})"
-  echo -e " Description  : Xray 管理脚本"
-  echo -e "----------------- 装载管理 ----------------"
-  echo -e "${GREEN}1.${NC} 安装"
-  echo -e "${GREEN}2.${NC} 更新"
-  echo -e "${GREEN}3.${NC} 卸载"
-  echo -e "----------------- 操作管理 ----------------"
-  echo -e "${GREEN}4.${NC} 启动"
-  echo -e "${GREEN}5.${NC} 停止"
-  echo -e "${GREEN}6.${NC} 重启"
-  echo -e "----------------- 配置管理 ----------------"
-  echo -e "${GREEN}101.${NC} 查看配置"
+  echo -e " Description  : Xray mannage shell"
+  echo -e "----------------- load management ----------------"
+  echo -e "${GREEN}1.${NC} install"
+  echo -e "${GREEN}2.${NC} update"
+  echo -e "${GREEN}3.${NC} uninstall"
+  echo -e "----------------- operation management ----------------"
+  echo -e "${GREEN}4.${NC} start"
+  echo -e "${GREEN}5.${NC} stop"
+  echo -e "${GREEN}6.${NC} reboot"
+  echo -e "----------------- config management ----------------"
+  echo -e "${GREEN}101.${NC} check config"
   echo -e "${GREEN}102.${NC} 信息统计"
   echo -e "${GREEN}103.${NC} 修改 id"
   echo -e "${GREEN}104.${NC} 修改 dest"
@@ -499,7 +498,7 @@ function menu() {
   echo -e "${GREEN}203.${NC} 修改 ssh 端口"
   echo -e "${GREEN}204.${NC} 网络连接优化"
   echo -e "-------------------------------------------"
-  echo -e "${RED}0.${NC} 退出"
+  echo -e "${RED}0.${NC} exit"
   read -rp "Choose: " idx
   ! _is_digit "${idx}" && _error "请输入正确的选项值"
   if [[ ! -d /usr/local/etc/xray-script && (${idx} -ne 0 && ${idx} -ne 1 && ${idx} -lt 201) ]]; then
@@ -527,14 +526,14 @@ function menu() {
     fi
     ;;
   2)
-    _info "判断 Xray 是否用新版本"
+    _info "check Xray is the latest..."
     local current_xray_version="$(jq -r '.xray.version' /usr/local/etc/xray-script/config.json)"
     local latest_xray_version="$(wget -qO- --no-check-certificate https://api.github.com/repos/XTLS/Xray-core/releases | jq -r '.[0].tag_name ' | cut -d v -f 2)"
     if _version_ge "${latest_xray_version}" "${current_xray_version}"; then
-      _info "检测到有新版可用"
+      _info "find latest available version"
       install_update_xray
     else
-      _info "当前已是最新版本: ${current_xray_version}"
+      _info "current one is the latest one: ${current_xray_version}"
     fi
     ;;
   3)
