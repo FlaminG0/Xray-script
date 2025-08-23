@@ -230,13 +230,13 @@ function select_dest() {
       _warn "如果输入列表中已有域名将会导致 serverNames 被修改"
       _warn "使用自填域名时，请确保该域名在国内的连通性"
       read_domain
-      _info "正在检查 \"${domain}\" 是否支持 TLSv1.3 与 h2"
+      _info "Checking \"${domain}\" 是否支持 TLSv1.3 与 h2"
       if ! _is_tlsv1_3_h2 "${domain}"; then
-        _warn "\"${domain}\" 不支持 TLSv1.3 或 h2 ，亦或者 Client Hello 不是 X25519"
+        _warn "\"${domain}\" No support TLSv1.3 或 h2 ，亦或者 Client Hello 不是 X25519"
         continue
       fi
-      _info "\"${domain}\" 支持 TLSv1.3 与 h2"
-      _info "正在获取 Allowed domains"
+      _info "\"${domain}\" Support TLSv1.3 and h2"
+      _info "Fetching Allowed domains"
       pick_dest=${domain}
       all_sns=$(xray tls ping ${pick_dest} | sed -n '/with SNI/,$p' | sed -En 's/\[(.*)\]/\1/p' | sed -En 's/Allowed domains:\s*//p' | jq -R -c 'split(" ")' | jq --arg sni "${pick_dest}" '. += [$sni]')
       sns=$(echo ${all_sns} | jq 'map(select(test("^[^*]+$"; "g")))' | jq -c 'map(select(test("^((?!cloudflare|akamaized|edgekey|edgesuite|cloudfront|azureedge|msecnd|edgecastcdn|fastly|googleusercontent|kxcdn|maxcdn|stackpathdns|stackpathcdn).)*$"; "ig")))')
@@ -254,7 +254,7 @@ function select_dest() {
     prompt="please choose your dest, currently using \"${cur_dest}\", DIY choose 0: "
     echo -e "-------------------------------------------"
   done
-  _info "正在修改配置"
+  _info "Config Modifying"
   [[ "${domain_path}" != "" ]] && pick_dest="${pick_dest}${domain_path}"
   if echo ${pick_dest} | grep -q '/$'; then
     pick_dest=$(echo ${pick_dest} | sed -En 's|/+$||p')
@@ -483,8 +483,8 @@ function menu() {
   echo -e "${GREEN}6.${NC} reboot"
   echo -e "----------------- config management ----------------"
   echo -e "${GREEN}101.${NC} check config"
-  echo -e "${GREEN}102.${NC} 信息统计"
-  echo -e "${GREEN}103.${NC} 修改 id"
+  echo -e "${GREEN}102.${NC} info statis"
+  echo -e "${GREEN}103.${NC} change id"
   echo -e "${GREEN}104.${NC} 修改 dest"
   echo -e "${GREEN}105.${NC} 修改 x25519 key"
   echo -e "${GREEN}106.${NC} 修改 shortIds"
