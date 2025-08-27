@@ -462,8 +462,7 @@ function show_share_link() {
     done
   done
   echo -e "------------------------------------------"
-  echo -e "${RED}此脚本仅供交流学习使用，请勿使用此脚本行违法之事。${NC}"
-  echo -e "${RED}网络非法外之地，行非法之事，必将接受法律制裁。${NC}"
+  echo -e "${RED} No illeagl usage is allowed.${NC}"
   echo -e "------------------------------------------"
 }
 
@@ -485,17 +484,17 @@ function menu() {
   echo -e "${GREEN}101.${NC} check config"
   echo -e "${GREEN}102.${NC} info statis"
   echo -e "${GREEN}103.${NC} change id"
-  echo -e "${GREEN}104.${NC} 修改 dest"
-  echo -e "${GREEN}105.${NC} 修改 x25519 key"
-  echo -e "${GREEN}106.${NC} 修改 shortIds"
-  echo -e "${GREEN}107.${NC} 修改 xray 监听端口"
-  echo -e "${GREEN}108.${NC} 刷新已有的 shortIds"
+  echo -e "${GREEN}104.${NC} change dest"
+  echo -e "${GREEN}105.${NC} change x25519 key"
+  echo -e "${GREEN}106.${NC} change shortIds"
+  echo -e "${GREEN}107.${NC} change xray 监听端口"
+  echo -e "${GREEN}108.${NC} refresh current shortIds"
   echo -e "${GREEN}109.${NC} 追加自定义的 shortIds"
-  echo -e "${GREEN}110.${NC} 使用 WARP 分流，开启 OpenAI"
-  echo -e "----------------- 其他选项 ----------------"
+  echo -e "${GREEN}110.${NC} use WARP 分流，open OpenAI"
+  echo -e "----------------- other option----------------"
   echo -e "${GREEN}201.${NC} 更新至最新稳定版内核"
   echo -e "${GREEN}202.${NC} 卸载多余内核"
-  echo -e "${GREEN}203.${NC} 修改 ssh 端口"
+  echo -e "${GREEN}203.${NC} modify ssh port"
   echo -e "${GREEN}204.${NC} 网络连接优化"
   echo -e "-------------------------------------------"
   echo -e "${RED}0.${NC} exit"
@@ -541,17 +540,17 @@ function menu() {
     [[ -f /usr/local/etc/xray-script/sysctl.conf.bak ]] && mv -f /usr/local/etc/xray-script/sysctl.conf.bak /etc/sysctl.conf && _info "已还原网络连接设置"
     rm -rf /usr/local/etc/xray-script
     if docker ps | grep -q cloudflare-warp; then
-      _info '正在停止 cloudflare-warp'
+      _info 'Stopping cloudflare-warp'
       docker container stop cloudflare-warp
       docker container rm cloudflare-warp
     fi
     if docker images | grep -q e7h4n/cloudflare-warp; then
-      _info '正在卸载 cloudflare-warp'
+      _info 'Uninstalling cloudflare-warp'
       docker image rm e7h4n/cloudflare-warp
     fi
     rm -rf ${HOME}/.warp
     _info 'Docker 请自行卸载'
-    _info "已经完成卸载"
+    _info "Uninstalling finished"
     ;;
   4)
     _systemctl "start" "xray"
