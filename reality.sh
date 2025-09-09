@@ -363,9 +363,9 @@ function service_xray() {
 function config_xray() {
   _info "configing xray config.json"
   "${xray_config_manage}" --path ${HOME}/config.json --download
-  local xray_x25519="$(exec_generate '--x25519')"
-  local xs_private_key="$(echo "${xray_x25519}" | awk -F, '{print $1}')"
-  local xs_public_key="$(echo "${xray_x25519}" | awk -F, '{print $2}')"
+  local xray_x25519=$(xray x25519)
+  local xs_private_key=$(echo "$xray_x25519" | grep '^PrivateKey:' | awk '{print $2}')
+  local xs_public_key=$(echo "$xray_x25519" | grep '^Password:' | awk '{print $2}')
   # Xray-script config.json
   jq --arg privateKey "${xs_private_key}" '.xray.privateKey = $privateKey' /usr/local/etc/xray-script/config.json >/usr/local/etc/xray-script/new.json && mv -f /usr/local/etc/xray-script/new.json /usr/local/etc/xray-script/config.json
   jq --arg publicKey "${xs_public_key}" '.xray.publicKey = $publicKey' /usr/local/etc/xray-script/config.json >/usr/local/etc/xray-script/new.json && mv -f /usr/local/etc/xray-script/new.json /usr/local/etc/xray-script/config.json
@@ -587,9 +587,9 @@ function menu() {
     ;;
   105)
     _info "Changing x25519 key"
-    local xray_x25519="$(exec_generate '--x25519')"
-    local xs_private_key="$(echo "${xray_x25519}" | awk -F, '{print $1}')"
-    local xs_public_key="$(echo "${xray_x25519}" | awk -F, '{print $2}')"
+    local xray_x25519=$(xray x25519)
+    local xs_private_key=$(echo "$xray_x25519" | grep '^PrivateKey:' | awk '{print $2}')
+    local xs_public_key=$(echo "$xray_x25519" | grep '^Password:' | awk '{print $2}')
     # Xray-script config.json
     jq --arg privateKey "${xs_private_key}" '.xray.privateKey = $privateKey' /usr/local/etc/xray-script/config.json >/usr/local/etc/xray-script/new.json && mv -f /usr/local/etc/xray-script/new.json /usr/local/etc/xray-script/config.json
     jq --arg publicKey "${xs_public_key}" '.xray.publicKey = $publicKey' /usr/local/etc/xray-script/config.json >/usr/local/etc/xray-script/new.json && mv -f /usr/local/etc/xray-script/new.json /usr/local/etc/xray-script/config.json
