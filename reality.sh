@@ -265,9 +265,9 @@ function select_dest() {
 
 function read_domain() {
   until [[ ${is_domain} =~ ^[Yy]$ ]]; do
-    read -p "请输入域名：" domain
+    read -p "Please type in verify domain：" domain
     check_domain=$(echo ${domain} | grep -oE '[^/]+(\.[^/]+)+\b' | head -n 1)
-    read -r -p "请确认域名: \"${check_domain}\" [y/n] " is_domain
+    read -r -p "Please verify domain: \"${check_domain}\" [y/n] " is_domain
   done
   domain_path=$(echo "${domain}" | sed -En "s|.*${check_domain}(/.*)?|\1|p")
   domain=${check_domain}
@@ -487,19 +487,19 @@ function menu() {
   echo -e "${GREEN}104.${NC} change dest"
   echo -e "${GREEN}105.${NC} change x25519 key"
   echo -e "${GREEN}106.${NC} change shortIds"
-  echo -e "${GREEN}107.${NC} change xray 监听端口"
+  echo -e "${GREEN}107.${NC} change xray hearing port"
   echo -e "${GREEN}108.${NC} refresh current shortIds"
-  echo -e "${GREEN}109.${NC} 追加自定义的 shortIds"
-  echo -e "${GREEN}110.${NC} use WARP 分流，open OpenAI"
+  echo -e "${GREEN}109.${NC} adding selfdefined shortIds"
+  echo -e "${GREEN}110.${NC} use WARP distribution，open OpenAI"
   echo -e "----------------- other option----------------"
-  echo -e "${GREEN}201.${NC} 更新至最新稳定版内核"
-  echo -e "${GREEN}202.${NC} 卸载多余内核"
+  echo -e "${GREEN}201.${NC} update to latest stable core"
+  echo -e "${GREEN}202.${NC} uninstall redundent cores"
   echo -e "${GREEN}203.${NC} modify ssh port"
-  echo -e "${GREEN}204.${NC} 网络连接优化"
+  echo -e "${GREEN}204.${NC} net connection optimize"
   echo -e "-------------------------------------------"
   echo -e "${RED}0.${NC} exit"
   read -rp "Choose: " idx
-  ! _is_digit "${idx}" && _error "请输入正确的选项值"
+  ! _is_digit "${idx}" && _error "Please type in the right choose num"
   if [[ ! -d /usr/local/etc/xray-script && (${idx} -ne 0 && ${idx} -ne 1 && ${idx} -lt 201) ]]; then
     _error "未使用 Xray-script 进行安装"
   fi
@@ -517,7 +517,7 @@ function menu() {
       install_dependencies
       install_update_xray
       local xs_port=$(jq '.xray.port' /usr/local/etc/xray-script/config.json)
-      read_port "xray config 配置默认使用: ${xs_port}" "${xs_port}"
+      read_port "xray config config default use: ${xs_port}" "${xs_port}"
       read_uuid
       select_dest
       config_xray
@@ -577,16 +577,16 @@ function menu() {
     show_config
     ;;
   104)
-    _info "正在修改 dest 与 serverNames"
+    _info "Changing dest and serverNames"
     select_dest
     "${xray_config_manage}" -d "$(jq -r '.xray.dest' /usr/local/etc/xray-script/config.json | grep -Eoi '([a-zA-Z0-9](\-?[a-zA-Z0-9])*\.)+[a-zA-Z]{2,}')"
     "${xray_config_manage}" -sn "$(jq -c -r '.xray | .serverNames[.dest] | .[]' /usr/local/etc/xray-script/config.json | tr '\n' ',')"
-    _info "已成功修改 dest 与 serverNames"
+    _info "Changed dest and serverNames successfully"
     _systemctl "restart" "xray"
     show_config
     ;;
   105)
-    _info "正在修改 x25519 key"
+    _info "Changing x25519 key"
     local xray_x25519=$(xray x25519)
     local xs_private_key=$(echo ${xray_x25519} | awk '{print $3}')
     local xs_public_key=$(echo ${xray_x25519} | awk '{print $6}')
