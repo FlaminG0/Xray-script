@@ -365,7 +365,7 @@ function config_xray() {
   "${xray_config_manage}" --path ${HOME}/config.json --download
   local xray_x25519=$(xray x25519)
   local xs_private_key=$(echo "$xray_x25519" | grep '^PrivateKey:' | awk '{print $2}')
-  local xs_public_key=$(echo "$xray_x25519" | grep '^Password (PublicKey):' | awk '{print $3}')
+  local xs_public_key=$(echo "$xray_x25519" | grep -oP 'Password \(PublicKey\): \K\S+')
   # Xray-script config.json
   jq --arg privateKey "${xs_private_key}" '.xray.privateKey = $privateKey' /usr/local/etc/xray-script/config.json >/usr/local/etc/xray-script/new.json && mv -f /usr/local/etc/xray-script/new.json /usr/local/etc/xray-script/config.json
   jq --arg publicKey "${xs_public_key}" '.xray.publicKey = $publicKey' /usr/local/etc/xray-script/config.json >/usr/local/etc/xray-script/new.json && mv -f /usr/local/etc/xray-script/new.json /usr/local/etc/xray-script/config.json
@@ -589,7 +589,7 @@ function menu() {
     _info "Changing x25519 key"
     local xray_x25519=$(xray x25519)
     local xs_private_key=$(echo "$xray_x25519" | grep '^PrivateKey:' | awk '{print $2}')
-    local xs_public_key=$(echo "$xray_x25519" | grep '^Password (PublicKey):' | awk '{print $3}')
+    local xs_public_key=$(echo "$xray_x25519" |  grep -oP 'Password \(PublicKey\): \K\S+'))
     # Xray-script config.json
     jq --arg privateKey "${xs_private_key}" '.xray.privateKey = $privateKey' /usr/local/etc/xray-script/config.json >/usr/local/etc/xray-script/new.json && mv -f /usr/local/etc/xray-script/new.json /usr/local/etc/xray-script/config.json
     jq --arg publicKey "${xs_public_key}" '.xray.publicKey = $publicKey' /usr/local/etc/xray-script/config.json >/usr/local/etc/xray-script/new.json && mv -f /usr/local/etc/xray-script/new.json /usr/local/etc/xray-script/config.json
