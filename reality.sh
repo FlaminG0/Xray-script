@@ -332,7 +332,7 @@ function install_dependencies() {
 
 function install_update_xray() {
   _info "installing or updating Xray"
-  _error_detect 'bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install -u root --beta'
+  _error_detect 'bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install --beta'
   jq --arg ver "$(xray version | head -n 1 | cut -d \( -f 1 | grep -Eoi '[0-9.]*')" '.xray.version = $ver' /usr/local/etc/xray-script/config.json >/usr/local/etc/xray-script/new.json && mv -f /usr/local/etc/xray-script/new.json /usr/local/etc/xray-script/config.json
   wget -O /usr/local/etc/xray-script/update-dat.sh https://raw.githubusercontent.com/FlaminG0/Xray-script/main/tool/update-dat.sh
   chmod a+x /usr/local/etc/xray-script/update-dat.sh
